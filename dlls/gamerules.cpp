@@ -71,6 +71,39 @@ edict_t *CGameRules::GetPlayerSpawnSpot( CBasePlayer *pPlayer )
 	pPlayer->pev->punchangle = g_vecZero;
 	pPlayer->pev->fixangle = TRUE;
 
+	// co-op: (re)spawn next to a living teammate, not back at the map's start
+	if( UTIL_IsCoop() )
+	{
+		for( int i = 1; i <= gpGlobals->maxClients; i++ )
+		{
+			CBaseEntity *pMate = UTIL_PlayerByIndex( i );
+
+			if( !pMate || pMate == pPlayer || !pMate->IsPlayer() || !pMate->IsAlive() || FStrEq( STRING( pMate->pev->netname ), "" ))
+				continue;
+
+			// a free spot around them, in line of sight of where they stand
+			for( int j = 0; j < 8; j++ )
+			{
+				float flAngle = pMate->pev->angles.y + 180.0f + j * 45.0f;
+				Vector vecSpot = pMate->pev->origin + Vector( cos( flAngle * M_PI / 180.0f ), sin( flAngle * M_PI / 180.0f ), 0 ) * 64.0f;
+				TraceResult tr;
+
+				UTIL_TraceHull( pMate->pev->origin, vecSpot, dont_ignore_monsters, human_hull, pMate->edict(), &tr );
+				if( tr.fStartSolid || tr.fAllSolid || tr.flFraction < 1.0f )
+					continue;
+
+				UTIL_TraceHull( vecSpot, vecSpot, dont_ignore_monsters, human_hull, pPlayer->edict(), &tr );
+				if( tr.fStartSolid || tr.fAllSolid )
+					continue;
+
+				pPlayer->pev->origin = vecSpot;
+				pPlayer->pev->angles = pMate->pev->angles;
+				pPlayer->pev->angles.x = 0;
+				return pentSpawnSpot;
+			}
+		}
+	}
+
 	return pentSpawnSpot;
 }
 

@@ -1456,7 +1456,25 @@ void CChangeLevel::ChangeLevelNow( CBaseEntity *pActivator )
 	pev->dmgtime = gpGlobals->time;
 
 	CBaseEntity *pPlayer = CBaseEntity::Instance( g_engfuncs.pfnPEntityOfEntIndex( 1 ) );
-	if( !InTransitionVolume( pPlayer, m_szLandmarkName ) )
+	if( UTIL_IsCoop() )
+	{
+		// co-op: whoever gets there takes everyone along
+		pPlayer = NULL;
+		for( int i = 1; i <= gpGlobals->maxClients && !pPlayer; i++ )
+		{
+			CBaseEntity *pClient = UTIL_PlayerByIndex( i );
+
+			if( pClient && pClient->IsPlayer() && pClient->IsAlive() && InTransitionVolume( pClient, m_szLandmarkName ))
+				pPlayer = pClient;
+		}
+
+		if( !pPlayer )
+		{
+			ALERT( at_aiconsole, "No player is in the transition volume %s, aborting\n", m_szLandmarkName );
+			return;
+		}
+	}
+	else if( !InTransitionVolume( pPlayer, m_szLandmarkName ) )
 	{
 		ALERT( at_aiconsole, "Player isn't in the transition volume %s, aborting\n", m_szLandmarkName );
 		return;
@@ -2209,7 +2227,7 @@ void CTriggerCamera::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYP
 	}
 	if( !pActivator || !pActivator->IsPlayer() )
 	{
-		pActivator = CBaseEntity::Instance( g_engfuncs.pfnPEntityOfEntIndex( 1 ) );
+		pActivator = UTIL_CoopNearestPlayer( pev->origin );
 	}
 
 	m_hPlayer = pActivator;

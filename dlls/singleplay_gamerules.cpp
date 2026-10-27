@@ -61,6 +61,17 @@ BOOL CHalfLifeRules::IsDeathmatch( void )
 
 //=========================================================
 //=========================================================
+BOOL CHalfLifeRules::FPlayerCanTakeDamage( CBasePlayer *pPlayer, CBaseEntity *pAttacker )
+{
+	// co-op: no friendly fire (a teammate's grenades and rockets included)
+	if( UTIL_IsCoop() && pAttacker && pAttacker != pPlayer && pAttacker->IsPlayer() )
+		return FALSE;
+
+	return TRUE;
+}
+
+//=========================================================
+//=========================================================
 BOOL CHalfLifeRules::IsCoOp( void )
 {
 	return FALSE;

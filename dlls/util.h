@@ -242,6 +242,13 @@ extern CBaseEntity	*UTIL_FindEntityGeneric(const char *szName, Vector &vecSrc, f
 // Index is 1 based
 extern CBaseEntity	*UTIL_PlayerByIndex( int playerIndex );
 
+// Co-op (iOS port): several players on the single player rules, "coop 1".
+// Where the game means "the player", co-op takes the nearest living one;
+// outside co-op these are player 1, exactly as before.
+inline BOOL UTIL_IsCoop( void ) { return gpGlobals->coop && gpGlobals->maxClients > 1; }
+extern CBaseEntity	*UTIL_CoopNearestPlayer( const Vector &origin );
+extern edict_t		*UTIL_CoopNearestPlayerEdict( const Vector &origin );
+
 #define UTIL_EntitiesInPVS(pent)			(*g_engfuncs.pfnEntitiesInPVS)(pent)
 extern void			UTIL_MakeVectors		(const Vector &vecAngles);
 

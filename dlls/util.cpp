@@ -580,6 +580,41 @@ CBaseEntity *UTIL_PlayerByIndex( int playerIndex )
 	return pPlayer;
 }
 
+CBaseEntity *UTIL_CoopNearestPlayer( const Vector &origin )
+{
+	edict_t *pEdict = UTIL_CoopNearestPlayerEdict( origin );
+
+	return pEdict ? CBaseEntity::Instance( pEdict ) : NULL;
+}
+
+edict_t *UTIL_CoopNearestPlayerEdict( const Vector &origin )
+{
+	CBaseEntity *pBest = NULL;
+	float flBest = 0.0f;
+
+	if( !UTIL_IsCoop() )
+		return g_engfuncs.pfnPEntityOfEntIndex( 1 );
+
+	for( int i = 1; i <= gpGlobals->maxClients; i++ )
+	{
+		CBaseEntity *pPlayer = UTIL_PlayerByIndex( i );
+		float flDist;
+
+		if( !pPlayer || !pPlayer->IsPlayer() || !pPlayer->IsAlive() || FStrEq( STRING( pPlayer->pev->netname ), "" ))
+			continue;
+
+		flDist = ( pPlayer->pev->origin - origin ).Length();
+		if( !pBest || flDist < flBest )
+		{
+			pBest = pPlayer;
+			flBest = flDist;
+		}
+	}
+
+	// nobody alive: the first player, as outside co-op
+	return pBest ? pBest->edict() : g_engfuncs.pfnPEntityOfEntIndex( 1 );
+}
+
 void UTIL_MakeVectors( const Vector &vecAngles )
 {
 	MAKE_VECTORS( vecAngles );

@@ -1731,7 +1731,7 @@ Vector CBlood::BloodPosition( CBaseEntity *pActivator )
 			pPlayer = pActivator->edict();
 		}
 		else
-			pPlayer = g_engfuncs.pfnPEntityOfEntIndex( 1 );
+			pPlayer = UTIL_CoopNearestPlayerEdict( pev->origin );
 		if( pPlayer )
 			return( pPlayer->v.origin + pPlayer->v.view_ofs ) + Vector( RANDOM_FLOAT( -10.0f, 10.0f ), RANDOM_FLOAT( -10.0f, 10.0f ), RANDOM_FLOAT( -10.0f, 10.0f ) );
 	}
@@ -2033,7 +2033,7 @@ void CMessage::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useT
 		if( pActivator && pActivator->IsPlayer() )
 			pPlayer = pActivator;
 		else
-			pPlayer = CBaseEntity::Instance( g_engfuncs.pfnPEntityOfEntIndex( 1 ) );
+			pPlayer = UTIL_CoopNearestPlayer( pev->origin );
 
 		if( pPlayer )
 			UTIL_ShowMessage( STRING( pev->message ), pPlayer );

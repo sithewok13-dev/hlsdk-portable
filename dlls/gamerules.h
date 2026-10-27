@@ -197,6 +197,7 @@ public:
 
 	// Client damage rules
 	virtual float FlPlayerFallDamage( CBasePlayer *pPlayer );
+	virtual BOOL FPlayerCanTakeDamage( CBasePlayer *pPlayer, CBaseEntity *pAttacker );
 
 	// Client spawn/respawn control
 	virtual void PlayerSpawn( CBasePlayer *pPlayer );

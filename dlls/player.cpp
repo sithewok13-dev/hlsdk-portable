@@ -4836,7 +4836,7 @@ void CStripWeapons::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE
 	}
 	else if( !g_pGameRules->IsDeathmatch() )
 	{
-		pPlayer = (CBasePlayer *)CBaseEntity::Instance( g_engfuncs.pfnPEntityOfEntIndex( 1 ) );
+		pPlayer = (CBasePlayer *)UTIL_CoopNearestPlayer( pev->origin );
 	}
 
 	if( pPlayer )
