@@ -21,6 +21,7 @@
 #include "aglms.h"
 #include "agctf.h"
 #include "agdom.h"
+#include "aggungame.h"
 #include "aginfointermission.h"
 #include "agsuddendeath.h"
 #include "agtimeout.h"
@@ -96,6 +97,7 @@ public:
   AgLMS               m_LMS;
   AgCTF               m_CTF;
   AgDOM               m_DOM;
+  AgGunGame           m_GunGame;
   AgInfoIntermission  m_InfoInterMission;
   AgSuddenDeath       m_SuddenDeath;
   AgTimeout           m_Timeout;

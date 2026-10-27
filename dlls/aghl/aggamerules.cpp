@@ -63,6 +63,9 @@ bool AgGameRules::AgThink()
   
   //Update HUD timer and effective time.
   m_Timer.Think();
+
+  if (GUNGAME == AgGametype())
+    m_GunGame.Think();
   
   //Update vote status.
   //Handled globally m_Vote.Think();
@@ -143,7 +146,7 @@ void AgGameRules::Start(const AgString& sSpawn)
 
 int AgGameRules::DeadPlayerWeapons( CBasePlayer *pPlayer )
 {
-  if (ARENA == AgGametype() || ARCADE == AgGametype())
+  if (ARENA == AgGametype() || ARCADE == AgGametype() || GUNGAME == AgGametype())
     return GR_PLR_DROP_GUN_NO;
   else
     return GR_PLR_DROP_GUN_ACTIVE;
@@ -151,7 +154,7 @@ int AgGameRules::DeadPlayerWeapons( CBasePlayer *pPlayer )
 
 int AgGameRules::DeadPlayerAmmo( CBasePlayer *pPlayer )
 {
-  if (ARENA == AgGametype() || ARCADE == AgGametype())
+  if (ARENA == AgGametype() || ARCADE == AgGametype() || GUNGAME == AgGametype())
     return GR_PLR_DROP_AMMO_NO;
   else
     return GR_PLR_DROP_AMMO_ACTIVE;
@@ -400,6 +403,10 @@ void AgGameRules::PlayerSpawn(CBasePlayer* pPlayer)
         pPlayer->GiveAmmo( ag_start_rockets.value, "rockets", ROCKET_MAX_CARRY );
     }
   }
+
+  if (GUNGAME == AgGametype())
+    m_GunGame.Equip(pPlayer);
+
   pPlayer->m_bInSpawn = false;
 
   /*
@@ -538,6 +545,9 @@ void AgGameRules::ClientDisconnected( edict_t *pClient )
         }
       }
       
+      if (GUNGAME == AgGametype())
+        m_GunGame.ClientDisconnected(pPlayer);
+
       if (ARENA == AgGametype())
         m_Arena.ClientDisconnected(pPlayer);
       else if (LMS == AgGametype())
@@ -630,6 +640,9 @@ void AgGameRules::PlayerKilled( CBasePlayer *pVictim, entvars_t *pKiller, entvar
     Stats.PlayerKilled(pKillerPlayer, pVictim);
 #endif
 
+  if (GUNGAME == AgGametype())
+    m_GunGame.PlayerKilled(pVictim, pKillerPlayer);
+
   //Update the score cache.
   m_ScoreCache.UpdateScore(pVictim);
   if (pKillerPlayer && pVictim != pKillerPlayer )
@@ -691,6 +704,13 @@ BOOL AgGameRules::CanHavePlayerItem( CBasePlayer *pPlayer, CBasePlayerItem *pIte
   
   if (ARENA == AgGametype() && m_Arena.CanHaveItem())
     return TRUE;
+
+  if (GUNGAME == AgGametype())
+  {
+    if (!m_GunGame.CanHavePlayerItem(pPlayer, STRING(pItem->pev->classname)))
+      return FALSE;
+    return CGameRules::CanHavePlayerItem(pPlayer,pItem);
+  }
 
   const char* pszClass = STRING(pItem->pev->classname);
   if (0 == strncmp( pszClass, "weapon_", 7 ) || 
@@ -768,6 +788,9 @@ BOOL AgGameRules::IsAllowedToSpawn( CBaseEntity *pEntity )
     return FALSE;
 
   if (ARENA == AgGametype() && m_Arena.CanHaveItem())
+    return TRUE;
+
+  if (GUNGAME == AgGametype() && m_GunGame.CanHaveItem())
     return TRUE;
  
   return IsAllowedToSpawn(STRING(pEntity->pev->classname));

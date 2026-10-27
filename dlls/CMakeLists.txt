@@ -155,6 +155,7 @@ set (SVDLL_SOURCES
 	aghl/aggame.cpp
 	aghl/aggamemode.cpp
 	aghl/aggamerules.cpp
+	aghl/aggungame.cpp
 	aghl/agglobal.cpp
 	aghl/aginfointermission.cpp
 	aghl/aglms.cpp

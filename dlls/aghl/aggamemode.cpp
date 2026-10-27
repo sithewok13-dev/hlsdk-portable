@@ -41,6 +41,8 @@ void SetupGametype()
     g_GameType = SGBOW;
   else if (sGametype == "instagib")
     g_GameType = INSTAGIB;
+  else if (sGametype == "gungame")
+    g_GameType = GUNGAME;
 }
 
 const char *AgGamename()
